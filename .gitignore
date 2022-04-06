@@ -1,0 +1,8 @@
+bin/
+build/
+*.zip
+solution.txt
+output.txt
+.vscode/*
+*/.idea/*
+*/cmake-debug-output/*
