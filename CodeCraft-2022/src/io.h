@@ -69,6 +69,9 @@ public:
         T95 = (T * 95 + 99) / 100;
         T05 = T - T95;
 
+        T90 = (T * 90 + 99) / 100;
+        T10 = T - T90;
+
         if (debug) printf("reading site_bandwidth.csv\n");
         fp = getfile("site_bandwidth.csv");
         csvgetline(fp);
