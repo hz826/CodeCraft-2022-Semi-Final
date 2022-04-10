@@ -65,20 +65,19 @@ namespace sol2 {
         return true;
     }
 
-    bool v10[Server_limit];
+    struct server_info {
+        int j, cnt;
+    } ss[Server_limit];
 
     bool calc() {
         for (int j=1;j<=N;j++) if (apply[j]) rest[j] = T05;
 
-        memset(v10, 0, sizeof(v10));
         memset(extend, 0, sizeof(extend));
-
         vector<int> tmp;
         for (int j=1;j<=N;j++) tmp.push_back(j);
         random_shuffle(tmp.begin(), tmp.end());
         V10_ANS.clear();
         for (int j=0;j<10;j++) {
-            v10[tmp[j]] = true;
             V10_ANS.push_back(tmp[j]);
         }
 
@@ -86,7 +85,8 @@ namespace sol2 {
         for (int t=1;t<=T;t++) tmp.push_back(t);
         for (int j=1;j<=N;j++) if (apply[j]) {
             random_shuffle(tmp.begin(), tmp.end());
-            int cnt = v10[j] ? T10 : T05;
+            auto it = find(V10_ANS.begin(), V10_ANS.end(), j);
+            int cnt = (it != V10_ANS.end()) ? T10 : T05;
             for (int t=0;t<cnt;t++) extend[tmp[t]][j] = true;
         }
 
@@ -135,20 +135,21 @@ namespace sol2 {
                 int cnt = rand() % 4 + 1;
                 for (int i=0;i<cnt;i++) apply[st[i]] = !apply[st[i]];
 
-                bool flag = calc();
+                bool sol_valid = calc();
+                bool sol_accept = sol_valid;
                 int now;
 
-                if (flag) {
+                if (sol_valid) {
                     now = io.check();
                     int delta = now - last;
 
                     if (task_id < T_gen) {
                         answers.push_back(now);
-                        if (delta >= 0) flag = false;
+                        if (delta >= 0) sol_accept = false;
                     }
                     if (task_id == T_gen) {
                         sort(answers.begin(), answers.end());
-                        TEM = answers[70] -answers[30];
+                        TEM = answers[70] - answers[30];
                     }
 
                     if (delta >= 0 && task_id >= T_gen) {
@@ -158,10 +159,10 @@ namespace sol2 {
                         printf("\n");
 
                         if (exp(-delta / TEM) > random_float_01()) {
-                            flag = true;
+                            sol_accept = true;
                             printf("ACCEPT\n");
                         } else {
-                            flag = false;
+                            sol_accept = false;
                             printf("NOT ACCEPT\n");
                         }                        
                     }
@@ -170,7 +171,7 @@ namespace sol2 {
                     // for (int i=0;i<cnt;i++) printf("<%d,%d> ", st[i], apply[st[i]]);
                 }
 
-                if (!flag) {
+                if (!sol_accept) {
                     for (int i=0;i<cnt;i++) apply[st[i]] = !apply[st[i]];
                 } else {
                     last = now;

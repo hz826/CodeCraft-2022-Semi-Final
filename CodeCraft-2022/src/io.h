@@ -184,9 +184,12 @@ public:
 
         double score_d = 0;
         for (int j=1;j<=N;j++) {
+            auto it = find(V10_ANS.begin(), V10_ANS.end(), j);
+            int TTT = (it != V10_ANS.end()) ? T90 : T95;
+
             sort(Bandwidth[j]+1, Bandwidth[j]+T+1);
             if (sum[j] > 0) {
-                int w = Bandwidth[j][T95].first;
+                int w = Bandwidth[j][TTT].first;
                 if (w <= BaseCost) score_d += BaseCost;
                 else score_d += 1.0  * (w - BaseCost) * (w - BaseCost) / MaxBandwidth[j] + w;
             }
