@@ -27,7 +27,7 @@ namespace sol2 {
 
         sort(V.begin(), V.end());
         
-        for (pkg now : V) { 
+        for (pkg now : V) {
             int i = now.i;
             int k = now.k;
 
@@ -42,6 +42,8 @@ namespace sol2 {
             used[pos] += now.size;
             Answer[t][i][k] = pos;
         }
+
+        return true;
     }
 
     bool calc() {
