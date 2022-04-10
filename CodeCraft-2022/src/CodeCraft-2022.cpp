@@ -8,7 +8,7 @@
 using namespace std;
 
 //----------------------------------------------------------//
-const bool OnlineJudge = false; // 本地测试使用相对路径填 false，在线评测使用绝对路径填 true
+const bool OnlineJudge = true; // 本地测试使用相对路径填 false，在线评测使用绝对路径填 true
 //----------------------------------------------------------//
 
 // 本文件中的数组均为 1-index
@@ -22,6 +22,7 @@ int BaseCost;
 // 以上数据通过 io.read(); 得到
 
 int Answer[T_limit][User_limit][Flow_limit], AnswerSave[T_limit][User_limit][Flow_limit];
+vector<int> V10_ANS, V10_SAVE;
 int BestAnswer = 2e9;
 bool NewRecord = false;
 pair<int,int> Bandwidth[Server_limit][T_limit]; // io.check(); 计算出的排序后带宽使用量 (first) 和位置 (second)

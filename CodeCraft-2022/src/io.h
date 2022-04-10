@@ -197,6 +197,7 @@ public:
             BestAnswer = score;
             NewRecord = true;
             memcpy(AnswerSave, Answer, sizeof(Answer));
+            V10_SAVE = V10_ANS;
         } else {
             NewRecord = false;
         }
@@ -213,6 +214,15 @@ public:
 
         FILE * fp = fopen(path, "w");
         memcpy(Answer, AnswerSave, sizeof(Answer));
+        V10_ANS = V10_SAVE;
+
+        bool fflag = false;
+        for (int j : V10_ANS) {
+            if (fflag) fprintf(fp, ",");
+            fflag = true;
+            fprintf(fp, "%s", Nname[j]);
+        }
+        fprintf(fp, "\n");
         
         for (int t=1;t<=T;t++) {
             for (int i=1;i<=M;i++) {

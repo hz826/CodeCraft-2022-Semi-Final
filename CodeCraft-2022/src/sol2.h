@@ -65,15 +65,29 @@ namespace sol2 {
         return true;
     }
 
+    bool v10[Server_limit];
+
     bool calc() {
         for (int j=1;j<=N;j++) if (apply[j]) rest[j] = T05;
 
+        memset(v10, 0, sizeof(v10));
         memset(extend, 0, sizeof(extend));
+
         vector<int> tmp;
+        for (int j=1;j<=N;j++) tmp.push_back(j);
+        random_shuffle(tmp.begin(), tmp.end());
+        V10_ANS.clear();
+        for (int j=0;j<10;j++) {
+            v10[tmp[j]] = true;
+            V10_ANS.push_back(tmp[j]);
+        }
+
+        tmp.clear();
         for (int t=1;t<=T;t++) tmp.push_back(t);
         for (int j=1;j<=N;j++) if (apply[j]) {
             random_shuffle(tmp.begin(), tmp.end());
-            for (int t=0;t<T05;t++) extend[tmp[t]][j] = true;
+            int cnt = v10[j] ? T10 : T05;
+            for (int t=0;t<cnt;t++) extend[tmp[t]][j] = true;
         }
 
         for (int t=1;t<=T;t++) {
@@ -112,7 +126,8 @@ namespace sol2 {
         vector<int> answers;
         
         for (int task_id=0;;) {
-            //bool find_any_solution = false;
+            if (TLE_flag) break;
+
             for (int loop=1;loop<=IN_LOOP;loop++) {
                 if (TLE_flag) break;
                 random_shuffle(st.begin(), st.end());
