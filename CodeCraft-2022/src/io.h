@@ -151,16 +151,6 @@ public:
         }
     }
 
-    // void save_solution() {
-    //     memcpy(answer2, answer, sizeof(answer));
-    // }
-
-    // void load_solution() {
-    //     memcpy(answer, answer2, sizeof(answer));
-    // }
-
-    int SCORE = 2e9;
-
     int check() { // 检查输出合法性，并计算答案
         static int sum[Server_limit];
 
@@ -199,8 +189,15 @@ public:
             }
         }
         int score = (int) (score_d + 0.5);
+
+        if (score < BestAnswer) {
+            BestAnswer = score;
+            NewRecord = true;
+            memcpy(AnswerSave, Answer, sizeof(Answer));
+        } else {
+            NewRecord = false;
+        }
         
-        SCORE = min(SCORE, score);
         return score;
     }
 
@@ -212,6 +209,7 @@ public:
         sprintf(path, "%s%s", data_path, "solution.txt");
 
         FILE * fp = fopen(path, "w");
+        memcpy(Answer, AnswerSave, sizeof(Answer));
         
         for (int t=1;t<=T;t++) {
             for (int i=1;i<=M;i++) {
