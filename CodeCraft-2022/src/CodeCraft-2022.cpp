@@ -8,7 +8,7 @@
 using namespace std;
 
 //----------------------------------------------------------//
-const bool OnlineJudge = false; // 本地测试使用相对路径填 false，在线评测使用绝对路径填 true
+const bool OnlineJudge = true; // 本地测试使用相对路径填 false，在线评测使用绝对路径填 true
 //----------------------------------------------------------//
 
 // 本文件中的数组均为 1-index

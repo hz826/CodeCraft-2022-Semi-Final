@@ -14,6 +14,7 @@ namespace sol2 {
 
     bool extend[T_limit][Server_limit];
 
+    /*
     inline bool update_t(int t) {
         for (int j=1;j<=N;j++) used[j] = 0;
 
@@ -55,40 +56,95 @@ namespace sol2 {
 
             int pos = -1;
             random_shuffle(tmp.begin(), tmp.end());
-            for (int jj=1;jj<=N;jj++) {
+            for (int jj=0;jj<N;jj++) {
                 int j = tmp[jj];
-                if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= min(BaseCost, MaxBandwidth[j])) {
+                // int LIMIT = min(BaseCost, MaxBandwidth[j]);
+                int LIMIT = MaxBandwidth[j];
+                
+                if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= LIMIT) {
                     if (pos == -1 || used[pos] > used[j]) pos = j;
                 }
             }
 
             if (pos == -1) {
-                // VV.push_back(now);
+                VV.push_back(now);
+                return false;
+            } else {
+                used[pos] += now.size;
+                Answer[t][i][k] = pos;
+            }
+        }
+
+        for (const pkg &now : VV) {
+            int i = now.i;
+            int k = now.k;
+
+            int pos = -1;
+            random_shuffle(tmp.begin(), tmp.end());
+            for (int jj=0;jj<N;jj++) {
+                int j = tmp[jj];
+                if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= MaxBandwidth[j]) {
+                    if (pos == -1 || used[pos] > used[j]) pos = j;
+                }
+            }
+
+            if (pos == -1) {
                 return false;
             }
             used[pos] += now.size;
             Answer[t][i][k] = pos;
         }
 
-        // for (const pkg &now : VV) {
-        //     int i = now.i;
-        //     int k = now.k;
+        return true;
+    }
+    */
 
-        //     int pos = -1;
-        //     random_shuffle(tmp.begin(), tmp.end());
-        //     for (int jj=1;jj<=N;jj++) {
-        //         int j = tmp[jj];
-        //         if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= MaxBandwidth[j]) {
-        //             if (pos == -1 || used[pos] > used[j]) pos = j;
-        //         }
-        //     }
+   inline bool update_t(int t) {
+        for (int j=1;j<=N;j++) used[j] = 0;
 
-        //     if (pos == -1) {
-        //         return false;
-        //     }
-        //     used[pos] += now.size;
-        //     Answer[t][i][k] = pos;
-        // }
+        vector<pkg> V;
+        V.clear();
+
+        for (int i=1;i<=M;i++) {
+            for (int k=1;k<=F;k++) if (Demand[t][i][k]) {
+                V.push_back(pkg(i, k, Demand[t][i][k]));
+            }
+        }
+
+        sort(V.begin(), V.end());
+
+        for (int j=1;j<=N;j++) if (extend[t][j]) {
+            int rest = MaxBandwidth[j];
+
+            bool flag = true;
+            while (flag) {
+                flag = false;
+
+                for (auto it=V.begin();it!=V.end();++it) if (LinkAble[it->i][j] && it->size <= rest) {
+                    rest -= it->size;
+                    Answer[t][it->i][it->k] = j;
+                    V.erase(it);
+                    flag = true;
+                    break;
+                }
+            }
+        }
+        
+        for (pkg now : V) {
+            int i = now.i;
+            int k = now.k;
+
+            int pos = -1;
+            for (int j=1;j<=N;j++) if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= MaxBandwidth[j]) {
+                if (pos == -1 || used[pos] > used[j]) pos = j;
+            }
+
+            if (pos == -1) {
+                return false;
+            }
+            used[pos] += now.size;
+            Answer[t][i][k] = pos;
+        }
 
         return true;
     }
@@ -100,39 +156,43 @@ namespace sol2 {
             if (!update_t(t)) return false;
         }
 
+        // const int MOD = 5;
+
         memset(extend, 0, sizeof(extend));
-        // for (int t=1;t<=T05;t++) {
-        //     io.check();
-        //     for (int j=1;j<=N;j++) if (apply[j]) {
-        //         CheckTime();
-        //         if (TLE_flag) return false;
+        for (int t=1;t<=T05;t++) {
+            // if (t % MOD == 0) 
+                io.check();
+            for (int j=1;j<=N;j++) if (apply[j]) {
+                CheckTime();
+                if (TLE_flag) return false;
 
-        //         int tt = Bandwidth[j][T-t].second;
-        //         extend[tt][j] = true;
-        //         update_t(tt);
-        //     }
-        // }
+                int tt = Bandwidth[j][T-t].second;
+                extend[tt][j] = true;
+                update_t(tt);
+            }
+        }
 
-        // V10_ANS.clear();
-        // io.check();
-        // vector<pair<int,int>> tmp;
-        // for (int j=1;j<=N;j++) if (apply[j]) {
-        //     tmp.push_back(make_pair(-Bandwidth[j][T95].first, j));
-        // }
-        // sort(tmp.begin(), tmp.end());
-        // for (int j=0;j<10;j++) V10_ANS.push_back(tmp[j].second);
+        V10_ANS.clear();
+        io.check();
+        vector<pair<int,int>> tmp;
+        for (int j=1;j<=N;j++) if (apply[j]) {
+            tmp.push_back(make_pair(-Bandwidth[j][T95].first, j));
+        }
+        sort(tmp.begin(), tmp.end());
+        for (int j=0;j<10;j++) V10_ANS.push_back(tmp[j].second);
 
-        // for (int t=T05+1;t<=T10;t++) {
-        //     io.check();
-        //     for (int j : V10_ANS) {
-        //         CheckTime();
-        //         if (TLE_flag) return false;
+        for (int t=T05+1;t<=T10;t++) {
+            // if (t % MOD == 0) 
+                io.check();
+            for (int j : V10_ANS) {
+                CheckTime();
+                if (TLE_flag) return false;
 
-        //         int tt = Bandwidth[j][T-t].second;
-        //         extend[tt][j] = true;
-        //         update_t(tt);
-        //     }
-        // }
+                int tt = Bandwidth[j][T-t].second;
+                extend[tt][j] = true;
+                update_t(tt);
+            }
+        }
         
         return true;
     }
@@ -153,10 +213,11 @@ namespace sol2 {
     void main() {
         for (int j=1;j<=N;j++) apply[j] = true;
         for (int j=1;j<=N;j++) st.push_back(j);
+
         calc();
 
         const double RATE = 0.8, IN_LOOP = 30;
-        const int T_gen = 100;
+        const int T_gen = 50;
         int last = BestAnswer;
 
         double TEM = -1;
@@ -186,7 +247,7 @@ namespace sol2 {
                     }
                     if (task_id == T_gen) {
                         sort(answers.begin(), answers.end());
-                        TEM = answers[70] - answers[30];
+                        TEM = answers[int(0.7*T_gen)] - answers[int(0.3*T_gen)];
                     }
 
                     if (delta >= 0 && task_id >= T_gen) {
