@@ -1,7 +1,6 @@
 namespace sol2 {
     bool apply[Server_limit];
     int used[Server_limit];
-    int rest[Server_limit];
 
     struct pkg {
         int i, k, size;
@@ -18,8 +17,9 @@ namespace sol2 {
     inline bool update_t(int t) {
         for (int j=1;j<=N;j++) used[j] = 0;
 
-        vector<pkg> V;
+        vector<pkg> V, VV;
         V.clear();
+        VV.clear();
 
         for (int i=1;i<=M;i++) {
             for (int k=1;k<=F;k++) if (Demand[t][i][k]) {
@@ -45,58 +45,95 @@ namespace sol2 {
                 }
             }
         }
-        
-        for (pkg now : V) {
+
+        vector<int> tmp;
+        for (int jj=1;jj<=N;jj++) tmp.push_back(jj);
+
+        for (const pkg &now : V) {
             int i = now.i;
             int k = now.k;
 
             int pos = -1;
-            for (int j=1;j<=N;j++) if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= MaxBandwidth[j]) {
-                if (pos == -1 || used[pos] > used[j]) pos = j;
+            random_shuffle(tmp.begin(), tmp.end());
+            for (int jj=1;jj<=N;jj++) {
+                int j = tmp[jj];
+                if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= min(BaseCost, MaxBandwidth[j])) {
+                    if (pos == -1 || used[pos] > used[j]) pos = j;
+                }
             }
 
             if (pos == -1) {
+                // VV.push_back(now);
                 return false;
             }
             used[pos] += now.size;
             Answer[t][i][k] = pos;
         }
 
+        // for (const pkg &now : VV) {
+        //     int i = now.i;
+        //     int k = now.k;
+
+        //     int pos = -1;
+        //     random_shuffle(tmp.begin(), tmp.end());
+        //     for (int jj=1;jj<=N;jj++) {
+        //         int j = tmp[jj];
+        //         if (apply[j] && !extend[t][j] && LinkAble[i][j] && used[j] + now.size <= MaxBandwidth[j]) {
+        //             if (pos == -1 || used[pos] > used[j]) pos = j;
+        //         }
+        //     }
+
+        //     if (pos == -1) {
+        //         return false;
+        //     }
+        //     used[pos] += now.size;
+        //     Answer[t][i][k] = pos;
+        // }
+
         return true;
     }
 
-    struct server_info {
-        int j, cnt;
-    } ss[Server_limit];
-
     bool calc() {
-        for (int j=1;j<=N;j++) if (apply[j]) rest[j] = T05;
-
-        memset(extend, 0, sizeof(extend));
-        vector<int> tmp;
-        for (int j=1;j<=N;j++) tmp.push_back(j);
-        random_shuffle(tmp.begin(), tmp.end());
-        V10_ANS.clear();
-        for (int j=0;j<10;j++) {
-            V10_ANS.push_back(tmp[j]);
-        }
-
-        tmp.clear();
-        for (int t=1;t<=T;t++) tmp.push_back(t);
-        for (int j=1;j<=N;j++) if (apply[j]) {
-            random_shuffle(tmp.begin(), tmp.end());
-            auto it = find(V10_ANS.begin(), V10_ANS.end(), j);
-            int cnt = (it != V10_ANS.end()) ? T10 : T05;
-            for (int t=0;t<cnt;t++) extend[tmp[t]][j] = true;
-        }
-
         for (int t=1;t<=T;t++) {
             CheckTime();
             if (TLE_flag) return false;
-
             if (!update_t(t)) return false;
         }
 
+        memset(extend, 0, sizeof(extend));
+        // for (int t=1;t<=T05;t++) {
+        //     io.check();
+        //     for (int j=1;j<=N;j++) if (apply[j]) {
+        //         CheckTime();
+        //         if (TLE_flag) return false;
+
+        //         int tt = Bandwidth[j][T-t].second;
+        //         extend[tt][j] = true;
+        //         update_t(tt);
+        //     }
+        // }
+
+        // V10_ANS.clear();
+        // io.check();
+        // vector<pair<int,int>> tmp;
+        // for (int j=1;j<=N;j++) if (apply[j]) {
+        //     tmp.push_back(make_pair(-Bandwidth[j][T95].first, j));
+        // }
+        // sort(tmp.begin(), tmp.end());
+        // for (int j=0;j<10;j++) V10_ANS.push_back(tmp[j].second);
+
+        // for (int t=T05+1;t<=T10;t++) {
+        //     io.check();
+        //     for (int j : V10_ANS) {
+        //         CheckTime();
+        //         if (TLE_flag) return false;
+
+        //         int tt = Bandwidth[j][T-t].second;
+        //         extend[tt][j] = true;
+        //         update_t(tt);
+        //     }
+        // }
+        
         return true;
     }
 

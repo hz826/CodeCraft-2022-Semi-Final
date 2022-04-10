@@ -6,3 +6,4 @@ output.txt
 .vscode/*
 */.idea/*
 */cmake-debug-output/*
+*.sh
